@@ -1,4 +1,4 @@
-import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { BeforeInsert, BeforeUpdate, Column, Entity, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity()
 export class Product {
@@ -22,7 +22,7 @@ export class Product {
     })
     description: string;
 
-    @Column('text', {
+    @Column('text', { //esto es lo mismo que definir el type arriba descripcion
         unique: true
     })
     slug: string;
@@ -41,10 +41,32 @@ export class Product {
     gender: string;
 
 
-    /*@Column('text', {
+    @Column('text', {
         array: true,
         default: []
     })
     tags: string[];
-    */
+  
+
+    @BeforeInsert()
+    checkSlugInsert() {
+
+        if ( !this.slug ) {
+            this.slug = this.title;
+        }
+
+        this.slug = this.slug
+            .toLowerCase()
+            .replaceAll(' ','_')
+            .replaceAll("'",'')
+
+    }
+
+    @BeforeUpdate()
+    checkSlugUpdate() {
+        this.slug = this.slug
+            .toLowerCase()
+            .replaceAll(' ','_')
+            .replaceAll("'",'')
+    }
 }
